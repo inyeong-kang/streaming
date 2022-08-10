@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyMate</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../light.png">
+    <link href="../public/css/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  </head>
+  <body>
+    <header id="welcome">
+      <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container-fluid"><a class="navbar-brand">Final Challenge</a>
+          <form class="d-flex">
+            <input class="form-control me-2" type="text" required placeholder="Type a Room Name">
+            <button class="btn btn-primary">Enter</button>
+          </form>
+        </div>
+      </nav>
+      <div class="p-5 text-center bg-light">
+        <h1 class="mb-3">📚StudyMate📚</h1>
+        <h4 class="mb-3">✨Let's Study Together!✨</h4><img class="rounded mx-auto d-block" src="https://images.pexels.com/photos/327882/pexels-photo-327882.jpeg" alt="StudyMate" width="500" height="300">
+      </div>
+    </header>
+    <main>
+      <div id="call">
+        <div id="myStream">
+          <div class="post">
+            <div class="row">
+              <h2> </h2><br>
+              <h6></h6><span id="caution">Our simple WebRTC application will only permit a maximum of two peers to share a room.</span>
+              <h4>Your Video</h4>
+              <select class="form-select" id="cameras"></select>
+            </div>
+            <video id="myFace" autoplay playsinline></video>
+            <div class="row">
+              <div class="btn-group" role="group" aria-label="Control"> 
+                <button class="btn btn-primary" id="mute" type="button">Mute
+                  <svg class="bi bi-mic-mute" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M13 8c0 .564-.094 1.107-.266 1.613l-.814-.814A4.02 4.02 0 0 0 12 8V7a.5.5 0 0 1 1 0v1zm-5 4c.818 0 1.578-.245 2.212-.667l.718.719a4.973 4.973 0 0 1-2.43.923V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 1 0v1a4 4 0 0 0 4 4zm3-9v4.879l-1-1V3a2 2 0 0 0-3.997-.118l-.845-.845A3.001 3.001 0 0 1 11 3z"></path>
+                    <path d="m9.486 10.607-.748-.748A2 2 0 0 1 6 8v-.878l-1-1V8a3 3 0 0 0 4.486 2.607zm-7.84-9.253 12 12 .708-.708-12-12-.708.708z">                                   button#camera(type="button" class="btn btn-primary") Turn Camera Off</path>
+                  </svg>
+                </button>
+                <button class="btn btn-primary" id="camera" type="button">Turn Camera Off
+                  <svg class="bi bi-camera-video-off-fill" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M10.961 12.365a1.99 1.99 0 0 0 .522-1.103l3.11 1.382A1 1 0 0 0 16 11.731V4.269a1 1 0 0 0-1.406-.913l-3.111 1.382A2 2 0 0 0 9.5 3H4.272l6.69 9.365zm-10.114-9A2.001 2.001 0 0 0 0 5v6a2 2 0 0 0 2 2h5.728L.847 3.366zm9.746 11.925-10-14 .814-.58 10 14-.814.58z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <h4>Friend's Video</h4>
+            </div>
+            <video id="peerFace" autoplay playsinline></video>
+            <div class="row"><span id="clock">00:00</span><span>You're the Best!! Keep up the Good Work 👍</span></div>
+          </div>
+          <div class="post" id="chat">
+            <div class="row">
+              <h3>Chat</h3>
+              <div class="wrapper">
+                <div id="chatList">
+                  <ul></ul>
+                </div>
+                <div class="input-container">
+                  <form id="chatForm">
+                    <input type="text" required placeholder="Type a Message">
+                    <button class="btn btn-warning" type="button"> 
+                      <svg class="bi bi-send" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"></path>
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="/socket.io/socket.io.js"> </script>
+    <script src="/public/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy" crossorigin="anonymous"></script>
+  </body>
+</html>
