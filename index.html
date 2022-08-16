@@ -13,7 +13,7 @@
         <div class="container-fluid"><a class="navbar-brand">💡 Live-Tracker 💡</a>
             <form class="d-flex" id="join" method="POST" action='#'>
                 <input type="text" name="join_room" id="join_room" placeholder="Room Name">
-                <input class="btn btn-primary" type="submit" id="enter" value="Join Room" onclick="enterRoom()">
+                <input class="btn btn-primary" type="submit" id="enter" value="Join Room" onclick="initCall()">
             </form>
           </div>
     </nav>
@@ -88,28 +88,38 @@
     <input class="btn btn-danger" onclick="stop(); timerOff();" type="submit" value="Leave Room">
   </form>
 
-  <span id="time">00:00:00</span>
-  <h2>Recording</h2>
+  <span id="time">🕰 00:00:00</span><br><br>
+  <h4 style="display:inline">✏️ Recording</h4>
   <button type="button" class="btn btn-primary" id="record-start" onclick="recordStart()">Start </button> 
   <button type="button" class="btn btn-danger" id="record-stop" onclick="recordStop()">Stop</button>              
   <button type="button" class="btn btn-success" id="download">Download</button>               
-</div>
+</div><br>
 <div class="container">
     <div id="media" style="display: none">
-        <h2>Media</h2>
-        <audio id="audio" autoplay="true"></audio>
-        <video id="video" autoplay="true" playsinline="true"></video>
-    </div>
+        <h2>🎥 Media</h2>
+        <div id="myFace">
+            <audio id="audio" autoplay="true"></audio>
+            <video id="video" autoplay="true" playsinline="true"></video> 
+        </div>
+        <div class="btn-group" role="group" aria-label="Control">
+            <button id="mute" type="button" class="btn btn-primary"> Mute </button>
+            <button id="camera" type="button" class="btn btn-primary"> Turn Camera Off </button>
+        </div>
+        <div id="peerFace">
+            <audio id="peer-audio" autoplay="true"></audio>
+            <video id="peer-video" autoplay="true" playsinline="true"></video> 
+        </div>
+
 </div>
 
 <div class="container">
-    <h2>Send:</h2>
+    <h2>💬 Chat Send:</h2>
     <form id="send_room" method="POST" action='#'>
         <input type="text" name="room_name" id="room_name" placeholder="Room Name">
         <input type="text" name="room_data" id="room_data" placeholder="Message">
-        <input type="submit" value="Send to Room">
+        <input type="submit" class="btn btn-primary" value="Send to Room">
     </form>
-    <h2>Receive:</h2>
+    <h2>💬 Chat Receive:</h2>
     <div><p id="log"></p></div>
 </div>
 

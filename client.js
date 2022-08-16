@@ -2,11 +2,16 @@
 const $video = document.querySelector("#video");
 const btn_start = document.querySelector("#record_start");
 const btn_stop = document.querySelector("#record_stop");
-  
+const muteBtn = document.getElementById("mute");
+const cameraBtn = document.getElementById("camera");
+
 // MediaRecorder(녹화기) 변수 선언
 let mediaRecorder = null;
 // 스트림 데이터를 담아둘 배열 생성
 const arrVideoData = [];
+let myStream;
+let muted = false;
+let cameraOff = false;
 
 call.hidden = true;
 
@@ -17,18 +22,73 @@ var dataChannelLog = document.getElementById('data-channel'),
     signalingLog = document.getElementById('signaling-state');
 
 // peer connection
-var pc = null;
+let pc = null;
 
 // data channel
 var dc = null, dcInterval = null;
 
+
+  async function getMedia(deviceId) {
+    const initialConstrains = {
+      audio: true,
+      video: { facingMode: "user" },
+    };
+    const cameraConstraints = {
+      audio: true,
+      video: { deviceId: { exact: deviceId } },
+    };
+    try {
+      myStream = await navigator.mediaDevices.getUserMedia(
+        deviceId ? cameraConstraints : initialConstrains
+      );
+      $video.srcObject = myStream;
+    } catch (e) {
+      console.log(e);
+    }
+}
+  
+function handleMuteClick() {
+    myStream
+      .getAudioTracks()
+      .forEach((track) => (track.enabled = !track.enabled));
+    if (!muted) {
+      muteBtn.innerText = "Unmute";
+      muted = true;
+    } else {
+      muteBtn.innerText = "Mute";
+      muted = false;
+    }
+  }
+
+  function handleCameraClick() {
+    myStream
+      .getVideoTracks()
+      .forEach((track) => (track.enabled = !track.enabled));
+    if (cameraOff) {
+      cameraBtn.innerText = "Turn Camera Off";
+      cameraOff = false;
+    } else {
+      cameraBtn.innerText = "Turn Camera On";
+      cameraOff = true;
+    }
+}
+  
+//make connection
 function createPeerConnection() {
     var config = {
         sdpSemantics: 'unified-plan'
     };
 
     if (document.getElementById('use-stun').checked) {
-        config.iceServers = [{urls: ['stun:stun.l.google.com:19302']}];
+        config.iceServers = [{
+            urls: [
+                "stun:stun.l.google.com:19302",
+                "stun:stun1.l.google.com:19302",
+                "stun:stun2.l.google.com:19302",
+                "stun:stun3.l.google.com:19302",
+                "stun:stun4.l.google.com:19302",
+            ],        
+        }];
     }
 
     pc = new RTCPeerConnection(config);
@@ -114,12 +174,15 @@ function negotiate() {
     });
 }
 
+muteBtn.addEventListener("click", handleMuteClick);
+cameraBtn.addEventListener("click", handleCameraClick);
+
 const welcome = document.getElementById("welcome");
 const welcomeForm = welcome.querySelector("form");
 const head = document.getElementById("head");
 let roomName;
 
-function enterRoom(){
+async function initCall(){
     welcome.hidden = true;
     call.hidden = false;
     const roomTitle = document.getElementById("roomTitle");
@@ -132,8 +195,9 @@ function enterRoom(){
 
 function start() {
     //document.getElementById('start').style.display = 'none';
+    getMedia();
 
-    pc = createPeerConnection();    
+    pc = createPeerConnection(); //make connection
 
     var time_start = null;
 
@@ -194,9 +258,13 @@ function start() {
         if (constraints.video) {
             document.getElementById('media').style.display = 'block';
         }
-        navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-            stream.getTracks().forEach(function(track) {
-                pc.addTrack(track, stream);
+
+        //pc.addEventListener("icecandidate", handleIce);        
+        pc.addEventListener("addstream", handleAddStream);
+
+        navigator.mediaDevices.getUserMedia(constraints).then(function() {
+            myStream.getTracks().forEach(function(track) {
+                pc.addTrack(track, myStream);
             });
             return negotiate();
         }, function(err) {
@@ -207,6 +275,16 @@ function start() {
     }
 
     //document.getElementById('stop').style.display = 'inline-block';
+}
+/*
+function handleIce(data) {
+    console.log("sent candidate");
+    socket.emit("ice", data.candidate, roomName);
+}
+  */
+function handleAddStream(data) {
+    const peerFace = document.getElementById("peer-video");
+    peerFace.srcObject = data.stream;
 }
 
 function stop() {
@@ -354,7 +432,10 @@ $(document).ready(function(){
     socket.on('my_response', function(msg) {
         $('#log').append('<br>Received: ' + msg.data);
     });
-
+    
+    socket.on("ice", (ice, roomName) => {
+        socket.to(roomName).emit("ice", ice);
+    });
     // event handler for server sent data
     // the data is displayed in the "Received" section of the page
     // handlers for the different forms in the page
@@ -372,15 +453,6 @@ $(document).ready(function(){
         roomName = $('#join_room').val();
         return false;
     });
-    /*
-    const leaveForm = document.getElementById("leave");
-    function leaveRoom(event){
-        event.preventDefault();
-
-    
-    }
-    leaveForm.addEventListener("submit", leaveRoom);
-*/
     $('form#leave').submit(function(event) {
         socket.emit('leave', {room: roomName});
         console.log(roomName);
